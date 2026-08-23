@@ -2,15 +2,15 @@
 
 > your documents walked into a tool. they left as one.
 
-a dead-simple python CLI that grabs every **PDF**, **DOCX**, and **PPTX** in your current directory and smashes them into a single, clean `.txt` file. no config, no flags, no drama.
+a python CLI script that takes every PDF, DOCX, and PPTX in your current directory and converts them into a single, clean .txt file. no config, no flags, no extra hustle to play with.
 
 ---
 
 ## why?
 
-because copy-pasting 37 files into one doc at 2am for a context file is **not it**.
-
-contextual does the boring part so you can focus on pretending you read all of them.
+because copy-pasting 37 files into one doc file at 2am for a context file is **not it**.
+and, i felt the need for this be developed :)
+contextual does the boring part so you can focus on your work.
 
 ---
 
@@ -20,7 +20,7 @@ contextual does the boring part so you can focus on pretending you read all of t
 you run it → it finds your files → you press enter → you name the output → done.
 ```
 
-that's it. that's the tool.
+that's it. that's the tool. its intentionally small and built for this specific purpose.
 
 ---
 
@@ -65,16 +65,16 @@ your `.txt` file comes with:
 - each file's content clearly separated with dividers
 - page/slide numbers preserved
 
-basically it looks like someone organized your stuff. finally.
+basically it looks like someone organized your clutter. thank me later.
 
 ## use cases
 
-- **sending context to AI** - merge all your project docs into one file and feed it to ChatGPT, Claude, Gemini, or whatever LLM you're prompting. one file, full context, no copy-paste marathon.
-- **studying for exams** - dump all your lecture slides and notes into a single searchable text file. ctrl+F is now your best friend.
+- **sending context to AI** - merge all your project docs into one file and feed it to ChatGPT, Claude, Gemini, or whatever LLM you're prompting. one file, full context.
+- **studying for exams** - dump all your lecture slides and notes into a single searchable text file.
 - **project documentation** - combine scattered reports, specs, and presentations into one reference doc before a meeting or deadline.
 - **code review prep** - merge requirement docs, design specs, and test plans into a single file so reviewers have everything in one place.
 - **archiving** - turn a folder of mixed-format documents into a single plain text backup that'll open on literally anything, forever.
-
+- **you can** also pair this with markdown formatting for even better results.
 ---
 
 ## faq- you may ask
@@ -86,10 +86,10 @@ A: no. this is contextual, not excel anonymous.
 A: they sort by leading number automatically. name them `1-intro.pdf`, `2-body.docx`, etc. or don't. i'm not your mom.
 
 **Q: it says "making your file buddy" and waits 2 seconds even though it's already done.**
-A: vibes. it's called pacing.
+A: vibes. it's called pacing. just for ui.
 
 **Q: why doesn't page numbering work for .docx files?**
-A: because `.docx` files don't actually have "pages" as they're flow documents. page breaks only exist when Microsoft Word renders them on screen, and that info isn't stored in the file itself. so there's nothing to number. PDFs have real pages, PPTXs have real slides, DOCX has paragraphs. we just dump them all.
+A: because `.docx` files don't actually have "pages" as they're flow documents. page breaks only exist when Microsoft Word renders them on screen, and that info isn't stored in the file itself. so there's nothing to number. PDFs have real pages, PPTXs have real slides, DOCX has paragraphs. so, we just dump them all.
 
 ---
 
@@ -101,7 +101,7 @@ A: because `.docx` files don't actually have "pages" as they're flow documents. 
 
 ## made by
 
-**[@anshdhariwal](https://github.com/anshdhariwal)** built this instead of actually reading the documents.
+**[@anshdhariwal](https://github.com/anshdhariwal)** built this instead of actually the intended work. out of the box right?
 
 ---
 
