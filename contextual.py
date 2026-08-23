@@ -6,6 +6,10 @@ Run with: python contextual.py
 
 import sys, os, re, time, subprocess, io, hashlib
 
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
 def _importable(pkg):
     try: __import__(pkg); return True
     except ImportError: return False
@@ -25,7 +29,7 @@ from pptx import Presentation as _Presentation
 from pptx.enum.shapes import MSO_SHAPE_TYPE
 from PIL import Image
 
-OCR_MIN_BYTES = 10 * 1024
+OCR_MIN_BYTES = 1024
 OCR_MIN_SIDE = 64
 OCR_MAX_SIDE = 2000
 
@@ -94,7 +98,10 @@ def discover_files() -> list:
     )
 
 def _extract_pdf_ocr(path: str, page_nums: bool) -> tuple:
-    import fitz
+    try:
+        import pymupdf as fitz
+    except ImportError:
+        import fitz
     pages = []
     with fitz.open(path) as pdf:
         for i, page in enumerate(pdf, 1):
