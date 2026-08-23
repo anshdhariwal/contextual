@@ -50,6 +50,7 @@ everything else gets installed automatically on first run.
 | PDF extraction | ✓ (pdfplumber + pypdf fallback) |
 | DOCX extraction | ✓ (python-docx) |
 | PPTX extraction | ✓ (python-pptx) |
+| embedded image OCR | ✓ (offline, optional - you choose y/n) |
 | auto-installs deps | ✓ (you literally just run it) |
 | simple file sorting | ✓ (files starting with numbers sort correctly) |
 | page/slide labels | ✓ (optional - you choose y/n) |
@@ -91,10 +92,17 @@ A: vibes. it's called pacing. just for ui.
 **Q: why doesn't page numbering work for .docx files?**
 A: because `.docx` files don't actually have "pages" as they're flow documents. page breaks only exist when Microsoft Word renders them on screen, and that info isn't stored in the file itself. so there's nothing to number. PDFs have real pages, PPTXs have real slides, DOCX has paragraphs. so, we just dump them all.
 
+**Q: how does the OCR thing work?**
+A: say `y` when asked, and any images embedded in your docs get read locally with rapidocr (a small onnx model, no cloud, no api keys). the text lands exactly where the image was. logos and icons are skipped automatically, and repeated images (like a logo on every slide) only get processed once. first `y` installs the engine one time, after that it's fully offline.
+
+**Q: does OCR slow it down?**
+A: only for files that actually contain readable images. clean text docs process at the same speed as before.
+
 ---
 
 ## changelog
 
+- **v1.1** - optional offline OCR for images inside PDFs, DOCX and PPTX. scanned PDFs work now too.
 - **v1** - initial version of the tool. simple enough.
 
 ---
