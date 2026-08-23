@@ -4,7 +4,7 @@ contextual — developed by @anshdhariwal
 Run with: python contextual.py
 """
 
-import sys, os, re, time, subprocess
+import sys, os, re, time, subprocess, io, hashlib
 
 def _importable(pkg):
     try: __import__(pkg); return True
@@ -21,6 +21,64 @@ import pdfplumber
 from pypdf import PdfReader
 import docx as _docx
 from pptx import Presentation as _Presentation
+from PIL import Image
+
+OCR_MIN_BYTES = 10 * 1024
+OCR_MIN_SIDE = 64
+OCR_MAX_SIDE = 2000
+
+_ocr = False   # False = not loaded yet, None = unavailable, else the engine
+_ocr_cache = {}
+
+def get_ocr():
+    global _ocr
+    if _ocr is not False:
+        return _ocr
+    try:
+        from rapidocr_onnxruntime import RapidOCR
+    except ImportError:
+        print("\n  Installing OCR engine (rapidocr-onnxruntime, one-time) …")
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install",
+                                   "--quiet", "rapidocr-onnxruntime"])
+            from rapidocr_onnxruntime import RapidOCR
+        except Exception:
+            print("  couldn't set up OCR — continuing without it.\n")
+            _ocr = None
+            return None
+    print("  loading OCR model …")
+    _ocr = RapidOCR()
+    return _ocr
+
+def ocr_blob(blob: bytes) -> str:
+    key = hashlib.md5(blob).hexdigest()
+    if key in _ocr_cache:
+        return _ocr_cache[key]
+    text = ""
+    img = None
+    try:
+        img = Image.open(io.BytesIO(blob)).convert("RGB")
+        w, h = img.size
+        if len(blob) < OCR_MIN_BYTES or w < OCR_MIN_SIDE or h < OCR_MIN_SIDE:
+            img = None
+    except Exception:
+        img = None
+    if img is not None:
+        engine = get_ocr()
+        if engine is not None:
+            try:
+                if max(w, h) > OCR_MAX_SIDE:
+                    scale = OCR_MAX_SIDE / max(w, h)
+                    img = img.resize((int(w * scale), int(h * scale)))
+                import numpy as np
+                result, _ = engine(np.array(img)[:, :, ::-1])
+                if result:
+                    result.sort(key=lambda r: r[0][0][1])
+                    text = "\n".join(t for _, t, s in result)
+            except Exception:
+                text = ""
+    _ocr_cache[key] = text
+    return text
 
 def numeric_key(name: str):
     m = re.match(r"^(\d+)", name)
@@ -51,7 +109,7 @@ def extract_pdf(path: str, page_nums: bool) -> tuple:
             pass
     return "[EXTRACTION ERROR]", "error"
 
-def extract_docx(path: str, page_nums: bool) -> tuple:
+def extract_docx(path: str, page_nums: bool, ocr: bool = False) -> tuple:
     try:
         doc = _docx.Document(path)
         text = "\n".join(p.text for p in doc.paragraphs)
@@ -59,7 +117,7 @@ def extract_docx(path: str, page_nums: bool) -> tuple:
     except Exception as e:
         return f"[EXTRACTION ERROR — {e}]", "error"
 
-def extract_pptx(path: str, page_nums: bool) -> tuple:
+def extract_pptx(path: str, page_nums: bool, ocr: bool = False) -> tuple:
     try:
         prs = _Presentation(path)
         slides = []
@@ -74,10 +132,10 @@ def extract_pptx(path: str, page_nums: bool) -> tuple:
     except Exception as e:
         return f"[EXTRACTION ERROR — {e}]", "error"
 
-def extract(path: str, page_nums: bool) -> tuple:
+def extract(path: str, page_nums: bool, ocr: bool = False) -> tuple:
     ext = os.path.splitext(path)[1].lower()
-    if ext == ".docx": return extract_docx(path, page_nums)
-    if ext == ".pptx": return extract_pptx(path, page_nums)
+    if ext == ".docx": return extract_docx(path, page_nums, ocr)
+    if ext == ".pptx": return extract_pptx(path, page_nums, ocr)
     return extract_pdf(path, page_nums)
    
 def main():
@@ -115,6 +173,13 @@ def main():
     page_nums = pn == "y"
     print()
 
+    while True:
+        oc = input(" > OCR images inside documents? (y/n): ").strip().lower()
+        if oc in ("y", "n"): break
+        print("  Type y or n.\n")
+    use_ocr = oc == "y"
+    print()
+
     print("  making your file buddy………")
 
     start = time.time()
@@ -123,7 +188,7 @@ def main():
 
     results = []
     for f in files:
-        text, engine = extract(f, page_nums)
+        text, engine = extract(f, page_nums, use_ocr)
         results.append((f, text, engine))
 
     lines = [
