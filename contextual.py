@@ -20,6 +20,7 @@ if _missing:
 import pdfplumber
 from pypdf import PdfReader
 import docx as _docx
+from docx.oxml.ns import qn as _qn
 from pptx import Presentation as _Presentation
 from pptx.enum.shapes import MSO_SHAPE_TYPE
 from PIL import Image
@@ -110,11 +111,40 @@ def extract_pdf(path: str, page_nums: bool) -> tuple:
             pass
     return "[EXTRACTION ERROR]", "error"
 
+def _para_images(p) -> list:
+    blobs = []
+    for blip in p._p.iter(_qn("a:blip")):
+        rid = blip.get(_qn("r:embed"))
+        try:
+            blobs.append(p.part.rels[rid].target_part.blob)
+        except Exception:
+            pass
+    return blobs
+
 def extract_docx(path: str, page_nums: bool, ocr: bool = False) -> tuple:
     try:
         doc = _docx.Document(path)
-        text = "\n".join(p.text for p in doc.paragraphs)
-        return text, "python-docx"
+        items = []
+        for p in doc.paragraphs:
+            t = p.text
+            if ocr:
+                for blob in _para_images(p):
+                    found = ocr_blob(blob)
+                    if found:
+                        t += f"\n[Image]\n{found}"
+            items.append((p, t))
+        if page_nums:
+            pages, cur = [], []
+            for p, t in items:
+                if any(run.text == "" and "w:lastRenderedPageBreak" in
+                       (run._r.xml if hasattr(run, "_r") else "") for run in p.runs):
+                    pages.append(cur); cur = []
+                cur.append(t)
+            pages.append(cur)
+            text = "\n\n".join(f"[Page {i}]\n" + "\n".join(pg)
+                               for i, pg in enumerate(pages, 1) if any(pg))
+            return text, "python-docx"
+        return "\n".join(t for _, t in items), "python-docx"
     except Exception as e:
         return f"[EXTRACTION ERROR — {e}]", "error"
 
