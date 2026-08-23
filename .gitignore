@@ -1,2 +1,4 @@
 ﻿# windows junk
 __pycache__/
+node_modules/
+*.tgz

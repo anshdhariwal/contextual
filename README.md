@@ -26,6 +26,22 @@ that's it. that's the tool. its intentionally small and built for this specific 
 
 ## quick start
 
+no clone needed, if you have node:
+
+```bash
+npx contextual-py
+```
+
+or install it once and just run `contextual` anywhere:
+
+```bash
+npm i -g contextual-py
+cd whatever-folder
+contextual
+```
+
+old school also works:
+
 ```bash
 cd whatever-folder
 python contextual.py
@@ -35,7 +51,8 @@ python contextual.py
 
 ## requirements
 
-- python 3.10+
+- python 3.10+ (that's the actual engine)
+- node 14+ (only for the npx/npm route)
 - a folder with documents in it
 - the will to merge them
 

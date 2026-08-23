@@ -1,0 +1,38 @@
+{
+  "name": "contextual-py",
+  "version": "1.1.0",
+  "description": "merge every pdf, docx and pptx in your folder into one clean txt file. optional offline ocr.",
+  "bin": {
+    "contextual": "bin/contextual.js"
+  },
+  "files": [
+    "bin",
+    "contextual.py",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "keywords": [
+    "pdf",
+    "docx",
+    "pptx",
+    "ocr",
+    "concat",
+    "merge",
+    "context",
+    "llm",
+    "cli"
+  ],
+  "author": "Ansh Dhariwal <anshdhariwalhsr@gmail.com> (https://github.com/anshdhariwal)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anshdhariwal/contextual.git"
+  },
+  "bugs": {
+    "url": "https://github.com/anshdhariwal/contextual/issues"
+  },
+  "homepage": "https://github.com/anshdhariwal/contextual#readme",
+  "license": "MIT"
+}
