@@ -21,6 +21,7 @@ import pdfplumber
 from pypdf import PdfReader
 import docx as _docx
 from pptx import Presentation as _Presentation
+from pptx.enum.shapes import MSO_SHAPE_TYPE
 from PIL import Image
 
 OCR_MIN_BYTES = 10 * 1024
@@ -117,16 +118,30 @@ def extract_docx(path: str, page_nums: bool, ocr: bool = False) -> tuple:
     except Exception as e:
         return f"[EXTRACTION ERROR — {e}]", "error"
 
+def _slide_texts(shapes, ocr: bool) -> list:
+    out = []
+    for sh in shapes:
+        if sh.shape_type == MSO_SHAPE_TYPE.GROUP:
+            out += _slide_texts(sh.shapes, ocr)
+            continue
+        if ocr and sh.shape_type in (MSO_SHAPE_TYPE.PICTURE, MSO_SHAPE_TYPE.PLACEHOLDER):
+            try:
+                found = ocr_blob(sh.image.blob)
+                if found:
+                    out.append(f"[Image]\n{found}")
+            except Exception:
+                pass
+        if sh.has_text_frame:
+            for para in sh.text_frame.paragraphs:
+                out.append(para.text)
+    return out
+
 def extract_pptx(path: str, page_nums: bool, ocr: bool = False) -> tuple:
     try:
         prs = _Presentation(path)
         slides = []
         for i, slide in enumerate(prs.slides, 1):
-            texts = []
-            for shape in slide.shapes:
-                if shape.has_text_frame:
-                    for para in shape.text_frame.paragraphs:
-                        texts.append(para.text)
+            texts = _slide_texts(slide.shapes, ocr)
             slides.append((f"[Slide {i}]\n" if page_nums else "") + "\n".join(texts))
         return "\n\n".join(slides), "python-pptx"
     except Exception as e:
