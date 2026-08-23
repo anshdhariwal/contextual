@@ -1,8 +1,11 @@
 # contextual 📄
 
+[![npm](https://img.shields.io/npm/v/contextual-py)](https://www.npmjs.com/package/contextual-py)
+[![license](https://img.shields.io/npm/l/contextual-py)](LICENSE)
+
 > your documents walked into a tool. they left as one.
 
-a python CLI script that takes every PDF, DOCX, and PPTX in your current directory and converts them into a single, clean .txt file. no config, no flags, no extra hustle to play with.
+a python CLI script that takes every PDF, DOCX, and PPTX in your current directory and converts them into a single, clean .txt file. no config, no flags, no extra hustle to play with. images inside your docs get read too - optional offline OCR, nothing leaves your machine.
 
 ---
 
@@ -17,7 +20,7 @@ contextual does the boring part so you can focus on your work.
 ## how it works
 
 ```
-you run it → it finds your files → you press enter → you name the output → done.
+you run it → it finds your files → you press enter → you name the output → maybe say y to ocr → done.
 ```
 
 that's it. that's the tool. its intentionally small and built for this specific purpose.
@@ -119,7 +122,7 @@ A: only for files that actually contain readable images. clean text docs process
 
 ## changelog
 
-- **v1.1** - optional offline OCR for images inside PDFs, DOCX and PPTX. scanned PDFs work now too.
+- **v1.1** - optional offline OCR for images inside PDFs, DOCX and PPTX. scanned PDFs work now too. also published on npm as [`contextual-py`](https://www.npmjs.com/package/contextual-py).
 - **v1** - initial version of the tool. simple enough.
 
 ---
