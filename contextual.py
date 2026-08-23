@@ -93,7 +93,35 @@ def discover_files() -> list:
         key=numeric_key,
     )
 
-def extract_pdf(path: str, page_nums: bool) -> tuple:
+def _extract_pdf_ocr(path: str, page_nums: bool) -> tuple:
+    import fitz
+    pages = []
+    with fitz.open(path) as pdf:
+        for i, page in enumerate(pdf, 1):
+            items = []
+            for b in page.get_text("dict")["blocks"]:
+                y = b["bbox"][1]
+                if b["type"] == 0:
+                    txt = "\n".join("".join(s["text"] for s in ln["spans"])
+                                    for ln in b["lines"])
+                    if txt.strip():
+                        items.append((y, 0, txt))
+                else:
+                    found = ocr_blob(b.get("image") or b"")
+                    if found:
+                        items.append((y, 1, f"[Image]\n{found}"))
+            items.sort(key=lambda it: (it[0], it[1]))
+            body = "\n\n".join(t for _, _, t in items)
+            pages.append((f"[Page {i}]\n" if page_nums else "") + body)
+    text = "\n\n".join(pages)
+    return (text, "pymupdf+ocr")
+
+def extract_pdf(path: str, page_nums: bool, ocr: bool = False) -> tuple:
+    if ocr:
+        try:
+            return _extract_pdf_ocr(path, page_nums)
+        except Exception:
+            pass
     for fn, name in (
         (lambda: "\n\n".join(
             (f"[Page {i}]\n" if page_nums else "") + (p.extract_text() or '')
@@ -181,7 +209,7 @@ def extract(path: str, page_nums: bool, ocr: bool = False) -> tuple:
     ext = os.path.splitext(path)[1].lower()
     if ext == ".docx": return extract_docx(path, page_nums, ocr)
     if ext == ".pptx": return extract_pptx(path, page_nums, ocr)
-    return extract_pdf(path, page_nums)
+    return extract_pdf(path, page_nums, ocr)
    
 def main():
     print("\n              [ contextual — @anshdhariwal ]\n")
