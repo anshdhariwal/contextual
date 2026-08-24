@@ -218,7 +218,42 @@ def extract(path: str, page_nums: bool, ocr: bool = False) -> tuple:
     if ext == ".pptx": return extract_pptx(path, page_nums, ocr)
     return extract_pdf(path, page_nums, ocr)
    
+def parse_args():
+    import argparse
+    p = argparse.ArgumentParser(
+        prog="contextual",
+        description="merge every pdf, docx and pptx in the current directory into one clean txt file")
+    p.add_argument("-f", "--fast", action="store_true",
+                   help="no questions, merge everything: output.txt, page labels on, ocr off")
+    p.add_argument("-o", "--output", metavar="NAME", help="output filename, .txt added automatically")
+    p.add_argument("--pages", dest="page_nums", action="store_true", help="label pages/slides in the output")
+    p.add_argument("--no-pages", dest="page_nums", action="store_false", help="keep each file as one text block")
+    p.add_argument("--ocr", dest="ocr", action="store_true", help="read text out of embedded images (offline)")
+    p.add_argument("--no-ocr", dest="ocr", action="store_false", help="skip embedded images entirely")
+    p.set_defaults(page_nums=None, ocr=None)
+    return p.parse_args()
+
+def ask(prompt: str, valid=("y", "n")) -> str:
+    while True:
+        a = input(prompt).strip().lower()
+        if a in valid:
+            return a
+        print(f"  Type {' or '.join(valid)}.\n")
+
 def main():
+    args = parse_args()
+
+    name = args.output
+    page_nums = args.page_nums
+    use_ocr = args.ocr
+    if args.fast:
+        if name is None: name = "output"
+        if page_nums is None: page_nums = True
+        if use_ocr is None: use_ocr = False
+
+    quiet = not sys.stdin.isatty()
+    unattended = all(x is not None for x in (name, page_nums, use_ocr))
+
     print("\n              [ contextual — @anshdhariwal ]\n")
     print("  tool uses all .pdf, .docx and .pptx files in the current directory\n")
 
@@ -236,29 +271,30 @@ def main():
         print(f"  {i:<4}{f}")
     print()
 
-    input("  Press Enter to continue … ")
-    print()
+    if quiet and not unattended:
+        print("  no terminal to ask questions in - pass -f, or set --output / --pages /")
+        print("  --no-pages / --ocr / --no-ocr explicitly.")
+        sys.exit(1)
 
-    while True:
-        name = input(" > Enter Output filename (without .txt): ").strip()
-        if name:
-            name = name.removesuffix(".txt")
-            break
-        print("  Filename cannot be empty.\n")
+    if not quiet and not unattended:
+        input("  Press Enter to continue … ")
+        print()
 
-    while True:
-        pn = input(" > Number pages/slides in output? (y/n): ").strip().lower()
-        if pn in ("y", "n"): break
-        print("  Type y or n.\n")
-    page_nums = pn == "y"
-    print()
+    if name is None:
+        while True:
+            name = input(" > Enter Output filename (without .txt): ").strip()
+            if name:
+                name = name.removesuffix(".txt")
+                break
+            print("  Filename cannot be empty.\n")
 
-    while True:
-        oc = input(" > OCR images inside documents? (y/n): ").strip().lower()
-        if oc in ("y", "n"): break
-        print("  Type y or n.\n")
-    use_ocr = oc == "y"
-    print()
+    if page_nums is None:
+        page_nums = ask(" > Number pages/slides in output? (y/n): ") == "y"
+        print()
+
+    if use_ocr is None:
+        use_ocr = ask(" > OCR images inside documents? (y/n): ") == "y"
+        print()
 
     print("  making your file buddy………")
 
