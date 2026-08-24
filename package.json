@@ -1,6 +1,6 @@
 {
   "name": "contextual-py",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "merge every pdf, docx and pptx in your folder into one clean txt file. optional offline ocr.",
   "bin": {
     "contextual": "bin/contextual.js"

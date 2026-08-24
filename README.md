@@ -50,6 +50,16 @@ cd whatever-folder
 python contextual.py
 ```
 
+### flags
+
+every question can be pre-answered. answer everything and it runs with zero prompts:
+
+```bash
+contextual -f                          # merge all, output.txt, pages on, ocr off
+contextual -o notes --no-pages --ocr   # custom name, one block per file, read images too
+contextual --ocr                       # just preset ocr, rest still asks nicely
+```
+
 ---
 
 ## requirements
@@ -122,6 +132,7 @@ A: only for files that actually contain readable images. clean text docs process
 
 ## changelog
 
+- **v1.2** - cli flags. `-f` for fully unattended runs, or pre-answer any subset (`-o`, `--pages/--no-pages`, `--ocr/--no-ocr`) and let the rest still ask.
 - **v1.1** - optional offline OCR for images inside PDFs, DOCX and PPTX. scanned PDFs work now too. also published on npm as [`contextual-py`](https://www.npmjs.com/package/contextual-py).
 - **v1** - initial version of the tool. simple enough.
 
