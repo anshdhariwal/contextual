@@ -81,6 +81,8 @@ everything else gets installed automatically on first run.
 | DOCX extraction | ✓ (python-docx) |
 | PPTX extraction | ✓ (python-pptx) |
 | embedded image OCR | ✓ (offline, optional - you choose y/n) |
+| interactive reorder | ✓ (swap any file, animated, others shift) |
+| file-type picker | ✓ (choose PDF / DOCX / PPTX / All when mixed) |
 | auto-installs deps | ✓ (you literally just run it) |
 | simple file sorting | ✓ (files starting with numbers sort correctly) |
 | page/slide labels | ✓ (optional - you choose y/n) |
@@ -114,7 +116,7 @@ basically it looks like someone organized your clutter. thank me later.
 A: no. this is contextual, not excel anonymous.
 
 **Q: can i reorder the files?**
-A: they sort by leading number automatically. name them `1-intro.pdf`, `2-body.docx`, etc. or don't. i'm not your mom.
+A: yep. after it finds your files you get a table - type `3 7` to move file 3 to position 7. watch it animate. or just name them `1-intro.pdf`, `2-body.docx` and skip the step.
 
 **Q: it says "making your file buddy" and waits 2 seconds even though it's already done.**
 A: vibes. it's called pacing. just for ui.
@@ -132,9 +134,25 @@ A: only for files that actually contain readable images. clean text docs process
 
 ## changelog
 
+- **v1.3** - rich terminal ui with file-type picker, animated reorder, progress bar with engine name and thank-you screen. fixes: headless filetype bypass, piped stdin handling, utf8 streams for piped output, and looser OCR guard for small images.
 - **v1.2** - cli flags. `-f` for fully unattended runs, or pre-answer any subset (`-o`, `--pages/--no-pages`, `--ocr/--no-ocr`) and let the rest still ask.
 - **v1.1** - optional offline OCR for images inside PDFs, DOCX and PPTX. scanned PDFs work now too. also published on npm as [`contextual-py`](https://www.npmjs.com/package/contextual-py).
 - **v1** - initial version of the tool. simple enough.
+
+---
+
+## thanks
+
+thanks to these amazing people for creating such useful utilities:
+
+- [pdfplumber](https://github.com/jsvine/pdfplumber) - pdf text extraction
+- [pypdf](https://github.com/py-pdf/pypdf) - pdf fallback
+- [PyMuPDF](https://github.com/pymupdf/PyMuPDF) - image-aware pdf reading
+- [python-docx](https://github.com/python-openxml/python-docx) - docx reading
+- [python-pptx](https://github.com/scanny/python-pptx) - pptx reading
+- [rapidocr-onnxruntime](https://github.com/RapidAI/RapidOCR) - offline OCR
+- [rich](https://github.com/Textualize/rich) - terminal ui
+- [Pillow](https://github.com/python-pillow/Pillow) - image handling
 
 ---
 
