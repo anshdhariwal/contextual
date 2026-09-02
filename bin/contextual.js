@@ -3,6 +3,7 @@ const { spawn } = require("child_process");
 const path = require("path");
 
 const script = path.join(__dirname, "..", "contextual.py");
+const forwarded = process.argv.slice(2);
 
 const candidates = process.platform === "win32"
   ? [["python"], ["py", "-3"]]
@@ -15,7 +16,7 @@ function tryNext() {
     console.error("  grab it from https://www.python.org/downloads/ and run again.\n");
     process.exit(1);
   }
-  const child = spawn(next[0], next.slice(1).concat(script), {
+  const child = spawn(next[0], next.slice(1).concat([script].concat(forwarded)), {
     stdio: "inherit",
     cwd: process.cwd(),
   });

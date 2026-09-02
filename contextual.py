@@ -21,6 +21,15 @@ if _missing:
     print(f"\n  Installing: {', '.join(_missing)} …\n")
     subprocess.check_call([sys.executable, "-m", "pip", "install", "--quiet"] + _missing)
 
+_ocr_needed = {"rapidocr_onnxruntime": "rapidocr-onnxruntime", "pymupdf": "PyMuPDF"}
+_ocr_missing = [pip for mod, pip in _ocr_needed.items() if not _importable(mod)]
+if _ocr_missing:
+    print(f"\n  Pre-installing OCR engine ({', '.join(_ocr_missing)}) — one-time …\n")
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "--quiet"] + _ocr_missing)
+    except Exception:
+        print("  Could not pre-install OCR engine — it will be installed on first OCR use.\n")
+
 import pdfplumber
 from pypdf import PdfReader
 import docx as _docx
